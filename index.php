@@ -57,6 +57,8 @@ echo '<details><summary>Session (Account)</summary><pre>', print_r($accountSessi
 <p><button id="collect-bank-account-token-customer">Collect Bank Account Token for Customer</button></p>
 <p><button id="collect-bank-account-token-account">Collect Bank Account Token for Account</button></p>
 
+<pre><code></code></pre>
+
 <script src="https://js.stripe.com/v3/"></script>
 <script>
   /**
@@ -68,27 +70,32 @@ echo '<details><summary>Session (Account)</summary><pre>', print_r($accountSessi
     const result = await stripe.collectFinancialConnectionsAccounts({
       clientSecret: '<?php echo $customerSession->client_secret; ?>',
     });
-    console.log(result);
+    log(result);
   });
 
   document.getElementById('collect-financial-connections-accounts-account').addEventListener('click', async () => {
     const result = await stripe.collectFinancialConnectionsAccounts({
       clientSecret: '<?php echo $accountSession->client_secret; ?>',
     });
-    console.log(result);
+    log(result);
   });
 
   document.getElementById('collect-bank-account-token-customer').addEventListener('click', async () => {
     const result = await stripe.collectBankAccountToken({
       clientSecret: '<?php echo $customerSession->client_secret; ?>',
     });
-    console.log(result);
+    log(result);
   });
 
   document.getElementById('collect-bank-account-token-account').addEventListener('click', async () => {
     const result = await stripe.collectBankAccountToken({
       clientSecret: '<?php echo $accountSession->client_secret; ?>',
     });
-    console.log(result);
+    log(result);
   });
+
+  function log(data) {
+    console.log(data);
+    document.querySelector('code').innerText = JSON.stringify(data, null, 2);
+  }
 </script>
