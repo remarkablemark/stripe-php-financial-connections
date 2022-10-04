@@ -1,10 +1,13 @@
 <?php
 
+require 'vendor/autoload.php';
+
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+$dotenv->load();
+
 /**
  * https://stripe.com/docs/financial-connections/other-data-powered-products?platform=web
  */
-
-require 'vendor/autoload.php';
 
 // Set your secret key. Remember to switch to your live secret key in production.
 // See your keys here: https://dashboard.stripe.com/apikeys
