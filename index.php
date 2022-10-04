@@ -31,28 +31,44 @@ $account = $stripe->accounts->create([
 
 echo '<details><summary>Account</summary><pre>', print_r($account), '</pre></details>';
 
-$session = $stripe->financialConnections->sessions->create(
+$customerSession = $stripe->financialConnections->sessions->create(
   [
     'account_holder' => ['type' => 'customer', 'customer' => $customer->id],
     'permissions' => ['balances', 'ownership', 'payment_method', 'transactions'],
   ]
 );
 
-echo '<details><summary>Session</summary><pre>', print_r($session), '</pre></details>';
+echo '<details><summary>Session (Customer)</summary><pre>', print_r($customerSession), '</pre></details>';
+
+$accountSession = $stripe->financialConnections->sessions->create(
+  [
+    'account_holder' => ['type' => 'account', 'account' => $account->id],
+    'permissions' => ['balances', 'ownership', 'payment_method', 'transactions'],
+    'filters' => ['countries' => ['US']],
+  ]
+);
+
+echo '<details><summary>Session (Account)</summary><pre>', print_r($accountSession), '</pre></details>';
 ?>
 
-<p><button>Financial Connections</button></p>
+<p><button id="collect-financial-connections-accounts-customer">Collect Financial Connections Accounts for Customer</button></p>
+<p><button id="collect-financial-connections-accounts-account">Collect Financial Connections Accounts for Account</button></p>
 
 <script src="https://js.stripe.com/v3/"></script>
 <script>
   const stripe = Stripe('<?php echo $_ENV['STRIPE_PUBLIC_KEY']; ?>');
 
-  async function collect() {
+  document.getElementById('collect-financial-connections-accounts-customer').addEventListener('click', async () => {
     const result = await stripe.collectFinancialConnectionsAccounts({
-      clientSecret: '<?php echo $session->client_secret; ?>',
+      clientSecret: '<?php echo $customerSession->client_secret; ?>',
     });
     console.log(result);
-  }
+  });
 
-  document.querySelector('button').addEventListener('click', collect);
+  document.getElementById('collect-financial-connections-accounts-account').addEventListener('click', async () => {
+    const result = await stripe.collectFinancialConnectionsAccounts({
+      clientSecret: '<?php echo $accountSession->client_secret; ?>',
+    });
+    console.log(result);
+  });
 </script>
