@@ -97,5 +97,17 @@ echo '<details><summary>Session (Account)</summary><pre>', print_r($accountSessi
   function log(data) {
     console.log(data);
     document.querySelector('code').innerText = JSON.stringify(data, null, 2);
+
+    /*
+    if (data.error) {
+      // Inform the customer that there was an error.
+      console.error('Error:', data.error.message);
+      // Handle next step based on length of accounts array
+    } else if (!data.financialConnectionsSession.accounts.length) {
+      console.warn('No accounts were linked');
+    } else {
+      console.info('Linked accounts:', data.financialConnectionsSession.accounts)
+    }
+    */
   }
 </script>
