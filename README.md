@@ -20,7 +20,8 @@ Go to http://localhost:4242/
 
 ## Demo
 
-[Replit](https://replit.com/@remarkablemark/Stripe-PHP-Financial-Connections)
+- [Stripe PHP Financial Connections](https://replit.com/@remarkablemark/Stripe-PHP-Financial-Connections)
+- [Stripe PHP Financial Connections Bank Account](https://replit.com/@remarkablemark/Stripe-PHP-Financial-Connections-Bank-Account)
 
 ## Resources
 
