@@ -51,11 +51,13 @@ $accountSession = $stripe->financialConnections->sessions->create(
 echo '<details><summary>Session (Account)</summary><pre>', print_r($accountSession), '</pre></details>';
 ?>
 
-<p><button id="collect-financial-connections-accounts-customer">Collect Financial Connections Accounts for Customer</button></p>
-<p><button id="collect-financial-connections-accounts-account">Collect Financial Connections Accounts for Account</button></p>
+<p><button name="collect-financial-connections-accounts-customer">Collect Financial Connections Accounts for Customer</button></p>
+<p><button name="collect-financial-connections-accounts-account">Collect Financial Connections Accounts for Account</button></p>
 
-<p><button id="collect-bank-account-token-customer">Collect Bank Account Token for Customer</button></p>
-<p><button id="collect-bank-account-token-account">Collect Bank Account Token for Account</button></p>
+<p><button name="collect-bank-account-token-customer">Collect Bank Account Token for Customer</button></p>
+<p><button name="collect-bank-account-token-account">Collect Bank Account Token for Account</button></p>
+
+<p><button name="create-external-account-for-payouts" disabled>Create External Account for Payouts</button></p>
 
 <pre><code></code></pre>
 
@@ -65,49 +67,73 @@ echo '<details><summary>Session (Account)</summary><pre>', print_r($accountSessi
    * https://stripe.com/docs/js/financial_connections
    */
   const stripe = Stripe('<?php echo $_ENV['STRIPE_PUBLIC_KEY']; ?>');
+  let result;
 
-  document.getElementById('collect-financial-connections-accounts-customer').addEventListener('click', async () => {
-    const result = await stripe.collectFinancialConnectionsAccounts({
+  document.querySelector('[name="collect-financial-connections-accounts-customer"]').addEventListener('click', async () => {
+    result = await stripe.collectFinancialConnectionsAccounts({
       clientSecret: '<?php echo $customerSession->client_secret; ?>',
     });
+    disableCollectButtons();
+    disableCreateButton(!result.token);
     log(result);
   });
 
-  document.getElementById('collect-financial-connections-accounts-account').addEventListener('click', async () => {
-    const result = await stripe.collectFinancialConnectionsAccounts({
+  document.querySelector('[name="collect-financial-connections-accounts-account"]').addEventListener('click', async () => {
+    result = await stripe.collectFinancialConnectionsAccounts({
       clientSecret: '<?php echo $accountSession->client_secret; ?>',
     });
+    disableCollectButtons();
+    disableCreateButton(!result.token);
     log(result);
   });
 
-  document.getElementById('collect-bank-account-token-customer').addEventListener('click', async () => {
-    const result = await stripe.collectBankAccountToken({
+  document.querySelector('[name="collect-bank-account-token-customer"]').addEventListener('click', async () => {
+    result = await stripe.collectBankAccountToken({
       clientSecret: '<?php echo $customerSession->client_secret; ?>',
     });
+    disableCollectButtons();
+    disableCreateButton(!result.token);
     log(result);
   });
 
-  document.getElementById('collect-bank-account-token-account').addEventListener('click', async () => {
-    const result = await stripe.collectBankAccountToken({
+  document.querySelector('[name="collect-bank-account-token-account"]').addEventListener('click', async () => {
+    result = await stripe.collectBankAccountToken({
       clientSecret: '<?php echo $accountSession->client_secret; ?>',
     });
+    disableCollectButtons();
+    disableCreateButton(!result.token);
     log(result);
+  });
+
+  document.querySelector('[name="create-external-account-for-payouts"]').addEventListener('click', async () => {
+    // Create bank account from `result.token.id`
+    const response = await fetch('/create.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        account_id: '<?php echo $account->id; ?>',
+        customer_id: '<?php echo $customer->id; ?>',
+        // btok_...
+        external_account: result.token.id,
+      }),
+    });
+    disableCreateButton();
+    const json = await response.json();
+    log(json);
   });
 
   function log(data) {
     console.log(data);
     document.querySelector('code').innerText = JSON.stringify(data, null, 2);
+  }
 
-    /*
-    if (data.error) {
-      // Inform the customer that there was an error.
-      console.error('Error:', data.error.message);
-      // Handle next step based on length of accounts array
-    } else if (!data.financialConnectionsSession.accounts.length) {
-      console.warn('No accounts were linked');
-    } else {
-      console.info('Linked accounts:', data.financialConnectionsSession.accounts)
-    }
-    */
+  function disableCollectButtons() {
+    document.querySelectorAll('[name^="collect-"]').forEach((button) => {
+      button.disabled = true;
+    });
+  }
+
+  function disableCreateButton(disabled = true) {
+    document.querySelector('[name="create-external-account-for-payouts"]').disabled = disabled;
   }
 </script>
