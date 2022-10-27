@@ -21,7 +21,8 @@ try {
     // Create an external account that you can use for payouts
     // https://stripe.com/docs/connect/payouts-bank-accounts?bank-account-collection-integration=direct-api#create-an-external-payouts-account
     $account = $stripe->accounts->update(
-      $_ENV['STRIPE_ACCOUNT_ID'],
+      // acct_...
+      $jsonObj->account_id || $jsonObj->customer_id,
       // btok_...
       ['external_account' => $jsonObj->external_account]
     );
